@@ -1,0 +1,33 @@
+{
+  "name": "good-errors",
+  "version": "0.0.1",
+  "description": "Utility stream to transform errors to object literals",
+  "main": "lib/index.js",
+  "keywords": [
+    "good",
+    "error",
+    "transform-stream",
+    "filtering",
+    "stream"
+  ],
+  "scripts": {
+    "test": "lab -m 5000 -t 100 -v -La code"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ben-leen/good-errors.git"
+  },
+  "license": "BSD-3-Clause",
+  "homepage": "https://github.com/ben-leen/good-errors",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "dependencies": {
+    "hoek": "4.x.x"
+  },
+  "devDependencies": {
+    "boom": "^3.2.2",
+    "code": "3.x.x",
+    "lab": "10.x.x"
+  }
+}
