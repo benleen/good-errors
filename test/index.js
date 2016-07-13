@@ -15,7 +15,7 @@ const it = lab.it;
 
 describe('Errors', () => {
 
-    it('converts errors to json objects', (done) => {
+    it('converts errors to object literals', (done) => {
 
         const stream = new Errors({});
 
@@ -35,7 +35,7 @@ describe('Errors', () => {
         stream.end({ data: err });
     });
 
-    it('converts boom wrapped errors to json objects', (done) => {
+    it('converts boom wrapped errors to object literals', (done) => {
 
         const stream = new Errors({});
 
@@ -72,23 +72,5 @@ describe('Errors', () => {
         });
 
         stream.end({ data: { a: 1 } });
-    });
-
-    it('leaves non good frames untouched', (done) => {
-
-        const stream = new Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal({ a: 1 });
-        });
-
-        stream.end({ a: 1 });
     });
 });
