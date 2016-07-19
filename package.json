@@ -1,6 +1,6 @@
 {
   "name": "good-errors",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Utility stream to transform errors to object literals",
   "main": "lib/index.js",
   "keywords": [
