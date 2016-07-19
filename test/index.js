@@ -93,4 +93,24 @@ describe('Errors', () => {
         err.stack = 'Some\nstack';
         stream.end({ data: { a: 1, b: { c: 'x', d: err } } });
     });
+
+    it('leaves non objects untouched', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result).to.equal('test');
+        });
+
+        const err = new Error('foo');
+        err.stack = 'Some\nstack';
+        stream.end('test');
+    });
 });
