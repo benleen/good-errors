@@ -57,6 +57,30 @@ describe('Errors', () => {
         stream.end({ data: err });
     });
 
+    it('add stringifyable property to errors nested in a passed error object (boom error)', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result.data.isBoom).to.equal(true);
+            expect(result.data.data.some).to.equal('other');
+            expect(result.data.data.important).to.equal('props');
+            expect(result.data.data.err.stringifyable).to.equal({ name: 'Error', stack: 'stack', message: 'some error' });
+        });
+
+        const err = new Error('some error');
+        err.stack = 'stack';
+        const b = Boom.internal('message', { err: err, some: 'other', important: 'props' });
+        stream.end({ data: b });
+    });
+
     it('leaves non error data untouched', (done) => {
 
         const stream = new Errors({});
