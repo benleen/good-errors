@@ -15,7 +15,7 @@ const it = lab.it;
 
 describe('Errors', () => {
 
-    it('converts errors to object literals', (done) => {
+    it('add stringifyable property to error objects', (done) => {
 
         const stream = new Errors({});
 
@@ -27,7 +27,7 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result).to.equal({ data: { name: 'Error', stack: 'Some\nstack', message: 'foo' } });
+            expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
         const err = new Error('foo');
@@ -35,7 +35,7 @@ describe('Errors', () => {
         stream.end({ data: err });
     });
 
-    it('converts boom wrapped errors to object literals', (done) => {
+    it('add stringifyable property to boom wrapped error objects', (done) => {
 
         const stream = new Errors({});
 
@@ -47,7 +47,8 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result).to.equal({ data: { name: 'Error', stack: 'Some\nstack', message: 'foo' } });
+            expect(result.data.isBoom).to.equal(true);
+            expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
         let err = new Error('foo');
@@ -74,7 +75,7 @@ describe('Errors', () => {
         stream.end({ data: { a: 1 } });
     });
 
-    it('converts Error deeper in the object', (done) => {
+    it('add stringifyable property to Error objects deeper in the passed object', (done) => {
 
         const stream = new Errors({});
 
@@ -86,7 +87,9 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result).to.equal({ data: { a: 1, b: { c: 'x', d: { name: 'Error', stack: 'Some\nstack', message: 'foo' } } } });
+            expect(result.data.a).to.equal(1);
+            expect(result.data.b.c).to.equal('x');
+            expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
         const err = new Error('foo');
