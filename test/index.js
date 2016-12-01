@@ -136,8 +136,80 @@ describe('Errors', () => {
             expect(result).to.equal('test');
         });
 
-        const err = new Error('foo');
-        err.stack = 'Some\nstack';
         stream.end('test');
+    });
+
+
+    it('accepts null', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result).to.equal(null);
+        });
+
+        stream.end(null);
+    });
+
+    it('accepts objects with null properties', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result).to.equal({ x: null });
+        });
+
+        stream.end({ x: null });
+    });
+
+
+    it('accepts undefined', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result).to.equal(undefined);
+        });
+
+        stream.end(undefined);
+    });
+
+    it('accepts objects with undefined properties', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result).to.equal({ x: undefined });
+        });
+
+        stream.end({ x: undefined });
     });
 });
