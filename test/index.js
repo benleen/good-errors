@@ -15,7 +15,7 @@ const it = lab.it;
 
 describe('Errors', () => {
 
-    it('converts errors to object literals', (done) => {
+    it('add stringifyable property to error objects', (done) => {
 
         const stream = new Errors({});
 
@@ -27,7 +27,7 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result).to.equal({ data: { name: 'Error', stack: 'Some\nstack', message: 'foo' } });
+            expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
         const err = new Error('foo');
@@ -35,7 +35,7 @@ describe('Errors', () => {
         stream.end({ data: err });
     });
 
-    it('converts boom wrapped errors to object literals', (done) => {
+    it('add stringifyable property to boom wrapped error objects', (done) => {
 
         const stream = new Errors({});
 
@@ -47,13 +47,38 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result).to.equal({ data: { name: 'Error', stack: 'Some\nstack', message: 'foo' } });
+            expect(result.data.isBoom).to.equal(true);
+            expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
         let err = new Error('foo');
         err.stack = 'Some\nstack';
         err = Boom.wrap(err);
         stream.end({ data: err });
+    });
+
+    it('add stringifyable property to errors nested in a passed error object (boom error)', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result.data.isBoom).to.equal(true);
+            expect(result.data.data.some).to.equal('other');
+            expect(result.data.data.important).to.equal('props');
+            expect(result.data.data.err.stringifyable).to.equal({ name: 'Error', stack: 'stack', message: 'some error' });
+        });
+
+        const err = new Error('some error');
+        err.stack = 'stack';
+        const b = Boom.internal('message', { err: err, some: 'other', important: 'props' });
+        stream.end({ data: b });
     });
 
     it('leaves non error data untouched', (done) => {
@@ -74,7 +99,7 @@ describe('Errors', () => {
         stream.end({ data: { a: 1 } });
     });
 
-    it('converts Error deeper in the object', (done) => {
+    it('add stringifyable property to Error objects deeper in the passed object', (done) => {
 
         const stream = new Errors({});
 
@@ -86,7 +111,9 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result).to.equal({ data: { a: 1, b: { c: 'x', d: { name: 'Error', stack: 'Some\nstack', message: 'foo' } } } });
+            expect(result.data.a).to.equal(1);
+            expect(result.data.b.c).to.equal('x');
+            expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
         const err = new Error('foo');
