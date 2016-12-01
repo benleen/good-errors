@@ -109,8 +109,6 @@ describe('Errors', () => {
             expect(result).to.equal('test');
         });
 
-        const err = new Error('foo');
-        err.stack = 'Some\nstack';
         stream.end('test');
     });
 });
