@@ -225,8 +225,7 @@ describe('Errors', () => {
                 return done();
             }
 
-            expect(result.data.a).to.equal(1);
-            expect(result.data.b.c).to.equal('x');
+            expect(result.data).to.exist();
             expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
         });
 
