@@ -212,4 +212,28 @@ describe('Errors', () => {
 
         stream.end({ x: undefined });
     });
+
+    it('accepts objects with circular dependencies', (done) => {
+
+        const stream = new Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result.data.a).to.equal(1);
+            expect(result.data.b.c).to.equal('x');
+            expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
+        });
+
+        const err = new Error('foo');
+        err.stack = 'Some\nstack';
+        const data = { a: 1, b: { c: 'x', d: err } };
+        data.b.circ = data;
+        stream.end({ data });
+    });
 });
