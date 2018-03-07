@@ -6,9 +6,6 @@ Utility stream to transform errors to object literals.
 Example usage as hapijs server options:
 ```
 const options = {
-    ops: {
-        interval: 1000
-    },
     reporters: {
         consoleReporter: [
         {
@@ -17,8 +14,7 @@ const options = {
             args: [{ log: '*', response: '*' }]
         },
         {
-            module: 'good-errors',
-            name: 'Errors'
+            module: 'good-errors'
         },
         {
             module: 'good-console'
