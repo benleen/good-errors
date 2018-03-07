@@ -6,9 +6,12 @@ Utility stream to transform errors to object literals.
 Example usage as hapijs server options:
 ```
 const options = {
+<<<<<<< HEAD
     ops: {
         interval: 1000
     },
+=======
+>>>>>>> Ensure compatibility with Hapi 17. Exporting the Errors module as the main module. Updated multiple dependencies
     reporters: {
         consoleReporter: [
         {
@@ -17,8 +20,12 @@ const options = {
             args: [{ log: '*', response: '*' }]
         },
         {
+<<<<<<< HEAD
             module: 'good-errors',
             name: 'Errors'
+=======
+            module: 'good-errors'
+>>>>>>> Ensure compatibility with Hapi 17. Exporting the Errors module as the main module. Updated multiple dependencies
         },
         {
             module: 'good-console'

@@ -7,6 +7,9 @@ const GoodErrors = require('..');
 const Code = require('code');
 const Lab = require('lab');
 const Boom = require('boom');
+const Hapi = require('hapi');
+const Good = require('good');
+const Stream = require('stream');
 
 const lab = exports.lab = Lab.script();
 const expect = Code.expect;
@@ -15,16 +18,16 @@ const it = lab.it;
 
 describe('Errors', () => {
 
-    it('add stringifyable property to error objects', (done) => {
+    it('add stringifyable property to error objects on a data propery', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
@@ -35,16 +38,36 @@ describe('Errors', () => {
         stream.end({ data: err });
     });
 
-    it('add stringifyable property to boom wrapped error objects', (done) => {
+    it('add stringifyable property to error objects on the error property', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
+            }
+
+            expect(result.error.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
+        });
+
+        const error = new Error('foo');
+        error.stack = 'Some\nstack';
+        stream.end({ error });
+    });
+
+    it('add stringifyable property to boom wrapped error objects', () => {
+
+        const stream = new GoodErrors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return;
             }
 
             expect(result.data.isBoom).to.equal(true);
@@ -53,20 +76,20 @@ describe('Errors', () => {
 
         let err = new Error('foo');
         err.stack = 'Some\nstack';
-        err = Boom.wrap(err);
+        err = Boom.boomify(err);
         stream.end({ data: err });
     });
 
-    it('add stringifyable property to errors nested in a passed error object (boom error)', (done) => {
+    it('add stringifyable property to errors nested in a passed error object (boom error)', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result.data.isBoom).to.equal(true);
@@ -77,20 +100,20 @@ describe('Errors', () => {
 
         const err = new Error('some error');
         err.stack = 'stack';
-        const b = Boom.internal('message', { err: err, some: 'other', important: 'props' });
+        const b = Boom.internal('message', { err, some: 'other', important: 'props' });
         stream.end({ data: b });
     });
 
-    it('leaves non error data untouched', (done) => {
+    it('leaves non error data untouched', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result).to.equal({ data: { a: 1 } });
@@ -99,16 +122,16 @@ describe('Errors', () => {
         stream.end({ data: { a: 1 } });
     });
 
-    it('add stringifyable property to Error objects deeper in the passed object', (done) => {
+    it('add stringifyable property to Error objects deeper in the passed object', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result.data.a).to.equal(1);
@@ -121,16 +144,16 @@ describe('Errors', () => {
         stream.end({ data: { a: 1, b: { c: 'x', d: err } } });
     });
 
-    it('leaves non objects untouched', (done) => {
+    it('leaves non objects untouched', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result).to.equal('test');
@@ -140,16 +163,16 @@ describe('Errors', () => {
     });
 
 
-    it('accepts null', (done) => {
+    it('accepts null', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result).to.equal(null);
@@ -158,16 +181,16 @@ describe('Errors', () => {
         stream.end(null);
     });
 
-    it('accepts objects with null properties', (done) => {
+    it('accepts objects with null properties', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result).to.equal({ x: null });
@@ -177,16 +200,16 @@ describe('Errors', () => {
     });
 
 
-    it('accepts undefined', (done) => {
+    it('accepts undefined', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result).to.equal(undefined);
@@ -195,16 +218,16 @@ describe('Errors', () => {
         stream.end(undefined);
     });
 
-    it('accepts objects with undefined properties', (done) => {
+    it('accepts objects with undefined properties', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result).to.equal({ x: undefined });
@@ -213,16 +236,16 @@ describe('Errors', () => {
         stream.end({ x: undefined });
     });
 
-    it('accepts objects with circular dependencies', (done) => {
+    it('accepts objects with circular dependencies', () => {
 
-        const stream = new GoodErrors.Errors({});
+        const stream = new GoodErrors({});
 
         stream.on('readable', () => {
 
             const result = stream.read();
 
             if (!result) {
-                return done();
+                return;
             }
 
             expect(result.data).to.exist();
@@ -234,5 +257,43 @@ describe('Errors', () => {
         const data = { a: 1, b: { c: 'x', d: err } };
         data.b.circ = data;
         stream.end({ data });
+    });
+
+    it('ensures basic compatibility with hapi, good & good-squeeze for errors', async () => {
+
+        const server = new Hapi.server();
+
+        class ValidationWriteStream extends Stream.Writable{
+            constructor(options) {
+
+                options = Object.assign({}, options, {
+                    objectMode: true
+                });
+                super(options);
+            }
+            _write(data, enc, next) {
+
+                expect(data.error.stringifyable).to.exist();
+                expect(data.error.stringifyable.message).to.equal('Boom!');
+                expect(data.error.stringifyable.name).to.equal('Error');
+                expect(data.error.stringifyable.stack).to.startWith('Error: Boom!\n    at handler');
+
+                return next(null, data);
+            };
+        }
+
+        const options = {
+            reporters: {
+                reporter: [{ module: 'good-squeeze', name: 'Squeeze', args: [{ error: '*' }] },
+                    { module: GoodErrors },
+                    { module: ValidationWriteStream }]
+            }
+        };
+
+        await server.register({ plugin: Good, options });
+        await server.start();
+        await server.route({ method: 'GET', path: '/', handler: () => Error('Boom!') });
+        await server.inject('/');
+
     });
 });
