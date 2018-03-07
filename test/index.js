@@ -2,7 +2,7 @@
 
 // Load modules
 
-const Errors = require('..').Errors;
+const GoodErrors = require('..');
 
 const Code = require('code');
 const Lab = require('lab');
@@ -17,7 +17,7 @@ describe('Errors', () => {
 
     it('add stringifyable property to error objects', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -37,7 +37,7 @@ describe('Errors', () => {
 
     it('add stringifyable property to boom wrapped error objects', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -59,7 +59,7 @@ describe('Errors', () => {
 
     it('add stringifyable property to errors nested in a passed error object (boom error)', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -83,7 +83,7 @@ describe('Errors', () => {
 
     it('leaves non error data untouched', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -101,7 +101,7 @@ describe('Errors', () => {
 
     it('add stringifyable property to Error objects deeper in the passed object', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -123,7 +123,7 @@ describe('Errors', () => {
 
     it('leaves non objects untouched', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -142,7 +142,7 @@ describe('Errors', () => {
 
     it('accepts null', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -160,7 +160,7 @@ describe('Errors', () => {
 
     it('accepts objects with null properties', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -179,7 +179,7 @@ describe('Errors', () => {
 
     it('accepts undefined', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -197,7 +197,7 @@ describe('Errors', () => {
 
     it('accepts objects with undefined properties', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
@@ -215,7 +215,7 @@ describe('Errors', () => {
 
     it('accepts objects with circular dependencies', (done) => {
 
-        const stream = new Errors({});
+        const stream = new GoodErrors.Errors({});
 
         stream.on('readable', () => {
 
