@@ -96,11 +96,10 @@ describe('Errors', () => {
         expect(result).to.equal(input);
     });
 
-    it('accepts null', async () => {
+    it('accepts null without throwing', async () => {
 
         const input = null;
-        const result = await internals.goodErrorStreamInput(input);
-        expect(result).to.equal(input);
+        await internals.goodErrorStreamInput(input);
     });
 
     it('accepts objects with null properties', async () => {
@@ -110,11 +109,10 @@ describe('Errors', () => {
         expect(result).to.equal(input);
     });
 
-    it('accepts undefined', async () => {
+    it('accepts undefined without throwing', async () => {
 
         const input = undefined;
-        const result = await internals.goodErrorStreamInput(input);
-        expect(result).to.equal(input);
+        await internals.goodErrorStreamInput(input);
     });
 
     it('accepts objects with undefined properties', async () => {
