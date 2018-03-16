@@ -15,7 +15,7 @@ const it = lab.it;
 
 describe('Errors', () => {
 
-    it('add stringifyable property to error objects', (done) => {
+    it('add stringifyable property to error objects located in the data property', (done) => {
 
         const stream = new GoodErrors.Errors({});
 
@@ -33,6 +33,26 @@ describe('Errors', () => {
         const err = new Error('foo');
         err.stack = 'Some\nstack';
         stream.end({ data: err });
+    });
+
+    it('add stringifyable property to error objects located in the error property', (done) => {
+
+        const stream = new GoodErrors.Errors({});
+
+        stream.on('readable', () => {
+
+            const result = stream.read();
+
+            if (!result) {
+                return done();
+            }
+
+            expect(result.error.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
+        });
+
+        const err = new Error('foo');
+        err.stack = 'Some\nstack';
+        stream.end({ error: err });
     });
 
     it('add stringifyable property to boom wrapped error objects', (done) => {
