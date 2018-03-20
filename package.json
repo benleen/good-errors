@@ -32,5 +32,8 @@
     "good-squeeze": "^5.0.2",
     "hapi": "^17.2.2",
     "lab": "^15.3.0"
+  },
+  "peerDependencies": {
+    "good": "^8.1.0"
   }
 }
