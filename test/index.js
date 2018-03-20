@@ -7,232 +7,165 @@ const GoodErrors = require('..');
 const Code = require('code');
 const Lab = require('lab');
 const Boom = require('boom');
+const Hapi = require('hapi');
+const Good = require('good');
+const Stream = require('stream');
 
 const lab = exports.lab = Lab.script();
 const expect = Code.expect;
 const describe = lab.describe;
 const it = lab.it;
 
+
+const internals = {
+    buildSampleError: function () {
+
+        const err = new Error('foo');
+        err.stack = 'Some\nstack';
+        return err;
+    },
+    sampleErrorAsStringifyable: { name: 'Error', stack: 'Some\nstack', message: 'foo' },
+    goodErrorStreamInput: function (streamInput) {
+
+        return new Promise((resolve, reject) => {
+
+            const stream = new GoodErrors({});
+            stream.on('readable', () => {
+
+                return resolve(stream.read());
+            });
+            stream.end(streamInput);
+        });
+    }
+};
+
 describe('Errors', () => {
 
-    it('add stringifyable property to error objects', (done) => {
+    it('add stringifyable property to error objects on a data propery', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
-        });
-
-        const err = new Error('foo');
-        err.stack = 'Some\nstack';
-        stream.end({ data: err });
+        const input = { data: internals.buildSampleError() };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result.data.stringifyable).to.equal(internals.sampleErrorAsStringifyable);
     });
 
-    it('add stringifyable property to boom wrapped error objects', (done) => {
+    it('add stringifyable property to error objects on the error property', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result.data.isBoom).to.equal(true);
-            expect(result.data.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
-        });
-
-        let err = new Error('foo');
-        err.stack = 'Some\nstack';
-        err = Boom.wrap(err);
-        stream.end({ data: err });
+        const input = { error: internals.buildSampleError() };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result.error.stringifyable).to.equal(internals.sampleErrorAsStringifyable);
     });
 
-    it('add stringifyable property to errors nested in a passed error object (boom error)', (done) => {
+    it('add stringifyable property to boom wrapped error objects', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result.data.isBoom).to.equal(true);
-            expect(result.data.data.some).to.equal('other');
-            expect(result.data.data.important).to.equal('props');
-            expect(result.data.data.err.stringifyable).to.equal({ name: 'Error', stack: 'stack', message: 'some error' });
-        });
-
-        const err = new Error('some error');
-        err.stack = 'stack';
-        const b = Boom.internal('message', { err: err, some: 'other', important: 'props' });
-        stream.end({ data: b });
+        const input = { data: Boom.boomify(internals.buildSampleError()) };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result.data.isBoom).to.equal(true);
+        expect(result.data.stringifyable).to.equal(internals.sampleErrorAsStringifyable);
     });
 
-    it('leaves non error data untouched', (done) => {
+    it('add stringifyable property to errors nested in a passed error object (boom error)', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal({ data: { a: 1 } });
-        });
-
-        stream.end({ data: { a: 1 } });
+        const input = { data:  Boom.internal('message', { err: internals.buildSampleError(), some: 'other', important: 'props' }) };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result.data.isBoom).to.equal(true);
+        expect(result.data.data.some).to.equal('other');
+        expect(result.data.data.important).to.equal('props');
+        expect(result.data.data.err.stringifyable).to.equal(internals.sampleErrorAsStringifyable);
     });
 
-    it('add stringifyable property to Error objects deeper in the passed object', (done) => {
+    it('leaves non error data untouched', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result.data.a).to.equal(1);
-            expect(result.data.b.c).to.equal('x');
-            expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
-        });
-
-        const err = new Error('foo');
-        err.stack = 'Some\nstack';
-        stream.end({ data: { a: 1, b: { c: 'x', d: err } } });
+        const input = { data: { a: 1 } };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result).to.equal(input);
     });
 
-    it('leaves non objects untouched', (done) => {
+    it('add stringifyable property to Error objects deeper in the passed object', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal('test');
-        });
-
-        stream.end('test');
+        const input = { data: { a: 1, b: { c: 'x', d: internals.buildSampleError() } } };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result.data.a).to.equal(1);
+        expect(result.data.b.c).to.equal('x');
+        expect(result.data.b.d.stringifyable).to.equal(internals.sampleErrorAsStringifyable);
     });
 
+    it('leaves non objects untouched', async () => {
 
-    it('accepts null', (done) => {
-
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal(null);
-        });
-
-        stream.end(null);
+        const input = 'test';
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result).to.equal(input);
     });
 
-    it('accepts objects with null properties', (done) => {
+    it('accepts null without throwing', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal({ x: null });
-        });
-
-        stream.end({ x: null });
+        const input = null;
+        await internals.goodErrorStreamInput(input);
     });
 
+    it('accepts objects with null properties', async () => {
 
-    it('accepts undefined', (done) => {
-
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal(undefined);
-        });
-
-        stream.end(undefined);
+        const input = { x: null };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result).to.equal(input);
     });
 
-    it('accepts objects with undefined properties', (done) => {
+    it('accepts undefined without throwing', async () => {
 
-        const stream = new GoodErrors.Errors({});
-
-        stream.on('readable', () => {
-
-            const result = stream.read();
-
-            if (!result) {
-                return done();
-            }
-
-            expect(result).to.equal({ x: undefined });
-        });
-
-        stream.end({ x: undefined });
+        const input = undefined;
+        await internals.goodErrorStreamInput(input);
     });
 
-    it('accepts objects with circular dependencies', (done) => {
+    it('accepts objects with undefined properties', async () => {
 
-        const stream = new GoodErrors.Errors({});
+        const input = { x: undefined };
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result).to.equal(input);
+    });
 
-        stream.on('readable', () => {
+    it('accepts objects with circular dependencies', async () => {
 
-            const result = stream.read();
+        const input = { data: { a: 1, b: { c: 'x', d: internals.buildSampleError() } } };
+        input.data.b.circ = input.data;
+        const result = await internals.goodErrorStreamInput(input);
+        expect(result.data).to.exist();
+        expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
+    });
 
-            if (!result) {
-                return done();
+    it('ensures basic compatibility with hapi, good & good-squeeze for errors', async () => {
+
+        const server = new Hapi.server();
+
+        class ValidationWriteStream extends Stream.Writable{
+            constructor(options) {
+
+                options = Object.assign({}, options, {
+                    objectMode: true
+                });
+                super(options);
             }
+            _write(data, enc, next) {
 
-            expect(result.data).to.exist();
-            expect(result.data.b.d.stringifyable).to.equal({ name: 'Error', stack: 'Some\nstack', message: 'foo' });
-        });
+                expect(data.error.stringifyable).to.exist();
+                expect(data.error.stringifyable.message).to.equal('Boom!');
+                expect(data.error.stringifyable.name).to.equal('Error');
+                expect(data.error.stringifyable.stack).to.startWith('Error: Boom!\n    at handler');
 
-        const err = new Error('foo');
-        err.stack = 'Some\nstack';
-        const data = { a: 1, b: { c: 'x', d: err } };
-        data.b.circ = data;
-        stream.end({ data });
+                return next(null, data);
+            };
+        }
+
+        const options = {
+            reporters: {
+                reporter: [{ module: 'good-squeeze', name: 'Squeeze', args: [{ error: '*' }] },
+                    { module: GoodErrors },
+                    { module: ValidationWriteStream }]
+            }
+        };
+
+        await server.register({ plugin: Good, options });
+        await server.start();
+        await server.route({ method: 'GET', path: '/', handler: () => Error('Boom!') });
+        await server.inject('/');
+
     });
 });

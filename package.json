@@ -20,14 +20,20 @@
   "license": "BSD-3-Clause",
   "homepage": "https://github.com/ben-leen/good-errors",
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=8.0.0"
   },
   "dependencies": {
-    "hoek": "4.x.x"
+    "hoek": "^5.0.3"
   },
   "devDependencies": {
-    "boom": "^3.2.2",
-    "code": "3.x.x",
-    "lab": "10.x.x"
+    "boom": "^7.2.0",
+    "code": "^5.2.0",
+    "good": "^8.1.0",
+    "good-squeeze": "^5.0.2",
+    "hapi": "^17.2.2",
+    "lab": "^15.3.0"
+  },
+  "peerDependencies": {
+    "good": "^8.1.0"
   }
 }
