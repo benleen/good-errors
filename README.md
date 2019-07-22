@@ -16,7 +16,7 @@ const options = {
                 args: [{ log: '*', response: '*' }]
             },
             {
-                module: '@hapi/good-errors'
+                module: 'good-errors'
             },
             {
                 module: '@hapi/good-console'
