@@ -8,21 +8,21 @@ Example usage as hapijs server options:
 
 ```javascript
 const options = {
-  reporters: {
-    consoleReporter: [
-      {
-        module: "@hapi/good-squeeze",
-        name: "Squeeze",
-        args: [{ log: "*", response: "*" }]
-      },
-      {
-        module: "@hapi/good-errors"
-      },
-      {
-        module: "@hapi/good-console"
-      },
-      "stdout"
-    ]
-  }
+    reporters: {
+        consoleReporter: [
+            {
+                module: '@hapi/good-squeeze',
+                name: 'Squeeze',
+                args: [{ log: '*', response: '*' }]
+            },
+            {
+                module: '@hapi/good-errors'
+            },
+            {
+                module: '@hapi/good-console'
+            },
+            'stdout'
+        ]
+    }
 };
 ```
