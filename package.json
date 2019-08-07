@@ -11,7 +11,7 @@
     "stream"
   ],
   "scripts": {
-    "test": "lab -m 5000 -t 100 -L -a code"
+    "test": "lab -m 5000 -t 100 -L -a @hapi/code"
   },
   "repository": {
     "type": "git",
@@ -23,17 +23,17 @@
     "node": ">=8.0.0"
   },
   "dependencies": {
-    "hoek": "^6.1.2"
+    "@hapi/hoek": "^8.0.2"
   },
   "devDependencies": {
-    "boom": "^7.2.0",
-    "code": "^5.2.0",
-    "good": "^8.1.0",
-    "good-squeeze": "^5.1.0",
-    "hapi": "^18.1.0",
-    "lab": "^18.0.1"
+    "@hapi/boom": "^7.4.2",
+    "@hapi/code": "^5.3.1",
+    "@hapi/good": "^8.2.0",
+    "@hapi/good-squeeze": "^5.2.0",
+    "@hapi/hapi": "^18.3.1",
+    "@hapi/lab": "^19.1.0"
   },
   "peerDependencies": {
-    "good": "^8.1.0"
+    "@hapi/good": "^8.2.0"
   }
 }
