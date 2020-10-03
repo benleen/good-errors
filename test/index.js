@@ -1,6 +1,6 @@
 'use strict';
 
-// Load modules
+// Load the modules
 
 const GoodErrors = require('..');
 
