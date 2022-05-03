@@ -22,18 +22,15 @@
   "engines": {
     "node": ">=8.0.0"
   },
-  "dependencies": {
-    "@hapi/hoek": "^8.0.2"
-  },
   "devDependencies": {
-    "@hapi/boom": "^7.4.2",
-    "@hapi/code": "^5.3.1",
-    "@hapi/good": "^8.2.0",
-    "@hapi/good-squeeze": "^5.2.0",
-    "@hapi/hapi": "^18.3.1",
-    "@hapi/lab": "^19.1.0"
+    "@hapi/boom": "^9.1.4",
+    "@hapi/code": "^8.0.7",
+    "@hapi/good": "^9.0.1",
+    "@hapi/good-squeeze": "^6.0.0",
+    "@hapi/hapi": "^20.2.2",
+    "@hapi/lab": "^24.6.0"
   },
   "peerDependencies": {
-    "@hapi/good": "^8.2.0"
+    "@hapi/good": "^9.0.1"
   }
 }
